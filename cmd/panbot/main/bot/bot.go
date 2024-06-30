@@ -1,27 +1,54 @@
 package bot
 
 import (
-	"fmt"
+	"github.com/brandao07/panbot/pkg/errors"
 	"github.com/bwmarrin/discordgo"
+	"github.com/fatih/color"
+	"log"
 	"os"
 	"os/signal"
+	"syscall"
 )
 
-var Token string
+func Run(token string) {
+	sess, err := initSession(token)
+	errors.Check(nil, err)
 
-func Run() {
-	// create a session
-	discord, err := discordgo.New("Bot " + Token)
+	defer func(sess *discordgo.Session) {
+		err := sess.Close()
+		errors.Check(nil, err)
+	}(sess)
+
+	addMessageHandler(sess)
+
+	err = startSession(sess)
+	errors.Check(nil, err)
+
+	log.Println("Bot is now running.")
+
+	waitForShutdown()
+}
+
+func initSession(token string) (*discordgo.Session, error) {
+	sess, err := discordgo.New("Bot " + token)
 	if err != nil {
-		panic("error creating Discord session: " + err.Error())
+		return nil, err
 	}
+	sess.Identify.Intents = discordgo.IntentsAllWithoutPrivileged
+	return sess, nil
+}
 
-	discord.Open()
-	defer discord.Close()
+func startSession(sess *discordgo.Session) error {
+	err := sess.Open()
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
-	// keep bot running untill there is NO os interruption (ctrl + C)
-	fmt.Println("Bot running....")
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	<-c
+func waitForShutdown() {
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	color.Unset()
+	<-sc
 }

@@ -74,4 +74,4 @@ Temporary Items
 .apdisk
 /tmp/
 /build/
-./.env
+/.env

@@ -29,9 +29,9 @@ tmp_dir = "tmp"
 
 [color]
   app = ""
-  build = "yellow"
-  main = "magenta"
-  runner = "green"
+  build = "blue"
+  main = "blue"
+  runner = "blue"
   watcher = "cyan"
 
 [log]
