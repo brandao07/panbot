@@ -16,5 +16,4 @@ COPY . .
 
 RUN make build
 
-# Hot-Reload
 CMD ["make", "run"]
