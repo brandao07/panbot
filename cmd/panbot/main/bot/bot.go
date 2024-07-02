@@ -2,6 +2,7 @@ package bot
 
 import (
 	"github.com/brandao07/panbot/pkg/errors"
+	"github.com/brandao07/panbot/pkg/todolist"
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"log"
@@ -10,7 +11,10 @@ import (
 	"syscall"
 )
 
+var storage *todolist.Storage
+
 func Run(token string) {
+	storage = todolist.NewStorage("items.json")
 	sess, err := initSession(token)
 	errors.Check(nil, err)
 

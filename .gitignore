@@ -75,3 +75,4 @@ Temporary Items
 /tmp/
 /build/
 /.env
+/items.json
