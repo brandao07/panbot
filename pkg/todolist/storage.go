@@ -123,7 +123,7 @@ func (s *Storage) FindByCategory(category category) (*[]Item, error) {
 	}
 	var filteredItems []Item
 	for _, v := range items {
-		if v.Category == category {
+		if v.Category == category && !v.IsCompleted {
 			filteredItems = append(filteredItems, v)
 		}
 	}

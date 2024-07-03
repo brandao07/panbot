@@ -2,6 +2,7 @@ package todolist
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -13,7 +14,7 @@ const (
 	Anime      category = "Anime"
 	Book       category = "Book"
 	Song       category = "Song"
-	MusicAlbum category = "Album"
+	MusicAlbum category = "Music Album"
 )
 
 var supportedCategories = map[category]bool{
@@ -25,6 +26,25 @@ var supportedCategories = map[category]bool{
 	MusicAlbum: true,
 }
 
+// String to category map for conversion
+var stringToCategory = map[string]category{
+	"MOVIE":       Movie,
+	"TV SHOW":     TvShow,
+	"ANIME":       Anime,
+	"BOOK":        Book,
+	"SONG":        Song,
+	"MUSIC ALBUM": MusicAlbum,
+}
+
+// Function to convert string to category
+func convertStringToCategory(s string) (category, error) {
+	s = strings.ToUpper(s)
+	if cat, exists := stringToCategory[s]; exists {
+		return cat, nil
+	}
+	return "", fmt.Errorf("invalid category")
+}
+
 type Item struct {
 	Name        string    `json:"name"`
 	Category    category  `json:"category"`
@@ -33,14 +53,18 @@ type Item struct {
 	CompletedAt time.Time `json:"completed_at"`
 }
 
-func NewItem(name string, category category, addedBy string) (*Item, error) {
-	if !supportedCategories[category] {
-		return nil, fmt.Errorf("category %s not supported", category)
+func NewItem(name string, category string, addedBy string) (*Item, error) {
+	c, err := convertStringToCategory(category)
+	if err != nil {
+		return nil, err
+	}
+	if !supportedCategories[c] {
+		return nil, fmt.Errorf("category %s not supported", c)
 	}
 
 	item := &Item{
 		Name:        name,
-		Category:    category,
+		Category:    c,
 		AddedBy:     addedBy,
 		IsCompleted: false,
 		CompletedAt: time.Time{},

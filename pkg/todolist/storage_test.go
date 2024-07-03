@@ -19,7 +19,7 @@ func TestStorage_Add(t *testing.T) {
 	}(tmpFile)
 
 	// Test adding a new item
-	item1, err := NewItem("Item1", Movie, "André")
+	item1, err := NewItem("Item1", "Movie", "André")
 	if err != nil {
 		t.Errorf("Error creating item: %s", err)
 	}
@@ -35,7 +35,7 @@ func TestStorage_Add(t *testing.T) {
 	}
 
 	// Test adding another item
-	item2, err := NewItem("Item2", Song, "André")
+	item2, err := NewItem("Item2", "Song", "André")
 	if err != nil {
 		t.Errorf("Error creating item: %s", err)
 	}
@@ -70,7 +70,7 @@ func TestStorage_FindByName(t *testing.T) {
 	storage := NewStorage(tmpFile)
 
 	// Add an item
-	item, err := NewItem("Item", Movie, "André")
+	item, err := NewItem("Item", "Movie", "André")
 	if err != nil {
 		t.Errorf("Error creating item: %s", err)
 	}
@@ -105,7 +105,7 @@ func TestStorage_MarkAsCompleted(t *testing.T) {
 	storage := NewStorage(tmpFile)
 
 	// Add an item
-	item, err := NewItem("Item", Movie, "André")
+	item, err := NewItem("Item", "Movie", "André")
 	if err != nil {
 		t.Errorf("Error creating item: %s", err)
 	}
@@ -136,7 +136,7 @@ func TestStorage_Remove(t *testing.T) {
 	}(tmpFile)
 
 	// Add an item
-	item, err := NewItem("Item", Movie, "André")
+	item, err := NewItem("Item", "Movie", "André")
 	if err != nil {
 		t.Errorf("Error creating item: %s", err)
 	}

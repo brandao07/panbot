@@ -76,3 +76,4 @@ Temporary Items
 /build/
 /.env
 /items.json
+/cmd/test/
