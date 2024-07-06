@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"github.com/brandao07/panbot/pkg/errors"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -25,6 +24,6 @@ func addMessageHandler(s *discordgo.Session) {
 }
 
 func sendMessage(s *discordgo.Session, channelID string, content string) {
-	_, err := s.ChannelMessageSend(channelID, content)
-	errors.Check(nil, err)
+	_, _ = s.ChannelMessageSend(channelID, content)
+
 }

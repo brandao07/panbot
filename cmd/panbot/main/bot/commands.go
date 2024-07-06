@@ -3,12 +3,40 @@ package bot
 import (
 	"github.com/brandao07/panbot/pkg/todolist"
 	"github.com/bwmarrin/discordgo"
+	"log"
+	"sync"
 )
 
-var (
-	categories = "(Anime, Book, Movie, Music Album, Song, TV Show)"
-	// Commands
-	commands = []*discordgo.ApplicationCommand{
+func addCommandHandler(s *discordgo.Session) {
+	commandHandlers := map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
+		"create-item":            createItem,
+		"delete-item":            deleteItem,
+		"find-items-by-category": findItemsByCategory,
+		"mark-as-completed":      markAsCompleted,
+	}
+
+	var wg sync.WaitGroup
+
+	// Add Handlers
+	for _, handler := range commandHandlers {
+		wg.Add(1)
+		go func(handler func(s *discordgo.Session, i *discordgo.InteractionCreate)) {
+			defer wg.Done()
+			s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+				if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
+					h(s, i)
+				}
+			})
+		}(handler)
+	}
+
+	wg.Wait()
+}
+
+func addCommands(s *discordgo.Session) {
+	categories := "(Anime, Book, Movie, Music Album, Song, TV Show)"
+
+	commands := []*discordgo.ApplicationCommand{
 		{
 			Name:        "create-item",
 			Description: "Creates a new item",
@@ -64,14 +92,14 @@ var (
 			},
 		},
 	}
-	// Handlers
-	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"create-item":            createItem,
-		"delete-item":            deleteItem,
-		"find-items-by-category": findItemsByCategory,
-		"mark-as-completed":      markAsCompleted,
+	// Adding commands
+	for _, v := range commands {
+		_, err := s.ApplicationCommandCreate(s.State.User.ID, "", v)
+		if err != nil {
+			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
+		}
 	}
-)
+}
 
 func markAsCompleted(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	options := i.ApplicationCommandData().Options
@@ -171,7 +199,7 @@ func createItem(s *discordgo.Session, i *discordgo.InteractionCreate) {
 }
 
 func respondToInteraction(s *discordgo.Session, i *discordgo.InteractionCreate, content string) {
-	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+	_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: content,
