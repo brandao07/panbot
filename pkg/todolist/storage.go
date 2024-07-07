@@ -116,7 +116,11 @@ func (s *Storage) FindByName(name string) (*Item, error) {
 	return nil, fmt.Errorf("item not found")
 }
 
-func (s *Storage) FindByCategory(category category) (*[]Item, error) {
+func (s *Storage) FindByCategory(categoryString string) (*[]ItemDTO, error) {
+	category, err := convertStringToCategory(categoryString)
+	if err != nil {
+		return nil, err
+	}
 	items, err := s.load()
 	if err != nil {
 		return nil, err
@@ -127,7 +131,16 @@ func (s *Storage) FindByCategory(category category) (*[]Item, error) {
 			filteredItems = append(filteredItems, v)
 		}
 	}
-	return &filteredItems, nil
+
+	if len(filteredItems) == 0 {
+		return nil, fmt.Errorf("category %s, has no items", categoryString)
+	}
+
+	var dto []ItemDTO
+	for _, v := range filteredItems {
+		dto = append(dto, *NewItemDTO(v.Name, v.AddedBy))
+	}
+	return &dto, nil
 }
 
 func (s *Storage) MarkAsCompleted(item *Item) error {

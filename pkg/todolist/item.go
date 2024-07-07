@@ -17,15 +17,6 @@ const (
 	MusicAlbum category = "Music Album"
 )
 
-var supportedCategories = map[category]bool{
-	Movie:      true,
-	TvShow:     true,
-	Anime:      true,
-	Book:       true,
-	Song:       true,
-	MusicAlbum: true,
-}
-
 var stringToCategory = map[string]category{
 	"MOVIE":       Movie,
 	"TV SHOW":     TvShow,
@@ -56,9 +47,6 @@ func NewItem(name string, category string, addedBy string) (*Item, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !supportedCategories[c] {
-		return nil, fmt.Errorf("category %s not supported", c)
-	}
 
 	item := &Item{
 		Name:        name,
@@ -68,4 +56,16 @@ func NewItem(name string, category string, addedBy string) (*Item, error) {
 		CompletedAt: time.Time{},
 	}
 	return item, nil
+}
+
+type ItemDTO struct {
+	Name string
+	User string
+}
+
+func NewItemDTO(name, user string) *ItemDTO {
+	return &ItemDTO{
+		Name: name,
+		User: user,
+	}
 }
