@@ -243,7 +243,6 @@ func createItem(s *discordgo.Session, i *discordgo.InteractionCreate) {
 }
 
 func replyWithError(s *discordgo.Session, i *discordgo.InteractionCreate, title, description string) {
-
 	embed := &discordgo.MessageEmbed{
 		Author:      &discordgo.MessageEmbedAuthor{},
 		Color:       0xff0000,
