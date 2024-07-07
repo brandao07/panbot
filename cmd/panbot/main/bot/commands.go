@@ -5,6 +5,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"log"
 	"sync"
+	"time"
 )
 
 func addCommandHandler(s *discordgo.Session) {
@@ -111,27 +112,27 @@ func markAsCompleted(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	name, ok := optionMap["name"]
 	if !ok {
-		respondToInteraction(s, i, "❌ No name specified")
+		replyWithError(s, i, "No name specified")
 		return
 	}
 
 	item, err := storage.FindByName(name.StringValue())
 	if err != nil {
-		respondToInteraction(s, i, "❌ Error finding the item:  "+err.Error())
+		replyWithError(s, i, "Error finding the item:  "+err.Error())
 		return
 	}
 
 	err = storage.MarkAsCompleted(item)
 	if err != nil {
-		respondToInteraction(s, i, "❌ Error completing the item: "+err.Error())
+		replyWithError(s, i, "Error completing the item: "+err.Error())
 		return
 	}
-	respondToInteraction(s, i, "Item completed successfully ✅")
+	reply(s, i, "Item completed successfully", nil)
 }
 
 func findItemsByCategory(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	// TODO Implement this method
-	respondToInteraction(s, i, "❌ Method not implemented!")
+	replyWithError(s, i, "Method not implemented!")
 }
 
 func deleteItem(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -144,22 +145,22 @@ func deleteItem(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	name, ok := optionMap["name"]
 	if !ok {
-		respondToInteraction(s, i, "❌ No name specified")
+		replyWithError(s, i, "No name specified")
 		return
 	}
 
 	item, err := storage.FindByName(name.StringValue())
 	if err != nil {
-		respondToInteraction(s, i, "❌ Error finding the item: "+err.Error())
+		replyWithError(s, i, "Error finding the item: "+err.Error())
 		return
 	}
 
 	err = storage.Remove(item)
 	if err != nil {
-		respondToInteraction(s, i, "❌ Error removing the item: "+err.Error())
+		replyWithError(s, i, "Error removing the item: "+err.Error())
 		return
 	}
-	respondToInteraction(s, i, "Item deleted successfully 🗑️")
+	reply(s, i, "Item deleted successfully", nil)
 }
 
 func createItem(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -173,36 +174,62 @@ func createItem(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	name, ok := optionMap["name"]
 	if !ok {
-		respondToInteraction(s, i, "❌ No name specified")
+		replyWithError(s, i, "No name specified")
 		return
 	}
 
 	category, ok := optionMap["category"]
 	if !ok {
-		respondToInteraction(s, i, "❌ No category specified")
+		replyWithError(s, i, "No category specified")
 		return
 	}
 
 	item, err := todolist.NewItem(name.StringValue(), category.StringValue(), username)
 	if err != nil {
-		respondToInteraction(s, i, "❌ Error creating the item: "+err.Error())
+		replyWithError(s, i, "Error creating the item: "+err.Error())
 		return
 	}
 
 	err = storage.Add(item)
 	if err != nil {
-		respondToInteraction(s, i, "❌ Error saving the item: "+err.Error())
+		replyWithError(s, i, "Error saving the item: "+err.Error())
 		return
 	}
 
-	respondToInteraction(s, i, "Item added successfully ✨")
+	reply(s, i, "Item added successfully", nil)
 }
 
-func respondToInteraction(s *discordgo.Session, i *discordgo.InteractionCreate, content string) {
+func replyWithError(s *discordgo.Session, i *discordgo.InteractionCreate, err string) {
+	embed := &discordgo.MessageEmbed{
+		Author:    &discordgo.MessageEmbedAuthor{},
+		Color:     0xff0000,
+		Timestamp: time.Now().Format(time.RFC3339),
+		Title:     err,
+	}
 	_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: content,
+			Embeds: []*discordgo.MessageEmbed{
+				embed,
+			},
+		},
+	})
+}
+
+func reply(s *discordgo.Session, i *discordgo.InteractionCreate, content string, fields []*discordgo.MessageEmbedField) {
+	embed := &discordgo.MessageEmbed{
+		Author:    &discordgo.MessageEmbedAuthor{},
+		Color:     0x00ff00,
+		Fields:    fields,
+		Timestamp: time.Now().Format(time.RFC3339),
+		Title:     content,
+	}
+	_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Embeds: []*discordgo.MessageEmbed{
+				embed,
+			},
 		},
 	})
 }

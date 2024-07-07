@@ -39,7 +39,6 @@ func Run() {
 	go func(s *discordgo.Session) {
 		// Discord Bot Handlers
 		addCommandHandler(s)
-		addMessageHandler(s)
 		s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 			log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 		})

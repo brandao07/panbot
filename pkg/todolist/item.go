@@ -26,7 +26,6 @@ var supportedCategories = map[category]bool{
 	MusicAlbum: true,
 }
 
-// String to category map for conversion
 var stringToCategory = map[string]category{
 	"MOVIE":       Movie,
 	"TV SHOW":     TvShow,
@@ -36,7 +35,6 @@ var stringToCategory = map[string]category{
 	"MUSIC ALBUM": MusicAlbum,
 }
 
-// Function to convert string to category
 func convertStringToCategory(s string) (category, error) {
 	s = strings.ToUpper(s)
 	if cat, exists := stringToCategory[s]; exists {
