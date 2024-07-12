@@ -15,6 +15,7 @@ const (
 	Book       category = "Book"
 	Song       category = "Song"
 	MusicAlbum category = "Music Album"
+	Game       category = "Game"
 )
 
 var stringToCategory = map[string]category{
@@ -24,6 +25,7 @@ var stringToCategory = map[string]category{
 	"BOOK":        Book,
 	"SONG":        Song,
 	"MUSIC ALBUM": MusicAlbum,
+	"GAME":        Game,
 }
 
 func convertStringToCategory(s string) (category, error) {

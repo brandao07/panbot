@@ -36,7 +36,7 @@ func addCommandHandler(s *discordgo.Session) {
 }
 
 func addCommands(s *discordgo.Session) {
-	categories := "(Anime, Book, Movie, Music Album, Song, TV Show)"
+	categories := "(Anime, Book, Game, Movie, Music Album, Song, TV Show)"
 
 	commands := []*discordgo.ApplicationCommand{
 		{
